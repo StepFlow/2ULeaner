@@ -1,5 +1,6 @@
 import re
 import sqlite3
+from datetime import datetime
 
 
 class TextParser:
@@ -14,7 +15,8 @@ class TextParser:
         self.select_pattern = \
             "SELECT id FROM words WHERE word = :word"
         self.insert_pattern = \
-            "INSERT INTO words (word, learned) VALUES (:word, :learned)"
+            "INSERT INTO words (word, learned, date) VALUES (:word, :learned, :date)"
+        self.unlearned_words = set()
 
     def __del__(self):
         self.db_connection.commit()
@@ -42,7 +44,13 @@ class TextParser:
         return True
 
     def add_last_word_to_db(self, known):
+        if not known:
+            self.unlearned_words.add(self.last_word)
+
         self.db_cursor.execute(
             self.insert_pattern,
-            {"word": self.last_word, "learned": known}
+            {"word": self.last_word, "learned": known, "date": datetime.isoformat(datetime.now(), sep=' ')}
         )
+
+    def get_unlearned_words(self):
+        return self.unlearned_words

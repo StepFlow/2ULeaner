@@ -47,6 +47,9 @@ def main(filename):
             print(word)
             text_parser.add_last_word_to_db(controller.is_known())
 
+        with open("output.txt", "w") as fout:
+            fout.write('\n'.join(text_parser.get_unlearned_words()))
+
     except FileNotFoundError:
         print('File "' + filename + '" was not found')
 
